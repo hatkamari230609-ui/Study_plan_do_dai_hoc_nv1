@@ -31,28 +31,28 @@
 <body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased overflow-x-hidden">
 
     <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-2">
                 <!-- App Logo & Title -->
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-xl shadow-lg shadow-sky-500/20">
-                        <i data-lucide="brain-circuit" class="w-6 h-6 text-white"></i>
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <div class="p-2 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-xl shadow-lg shadow-sky-500/20 shrink-0">
+                        <i data-lucide="brain-circuit" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
                     </div>
-                    <div>
-                        <h1 class="font-bold text-lg text-white leading-tight flex items-center gap-2">
-                            SRS Study Planner
+                    <div class="truncate">
+                        <h1 class="font-bold text-sm sm:text-lg text-white leading-tight flex items-center gap-1.5 flex-wrap">
+                            <span class="truncate">SRS Planner</span>
                             <!-- Streak Counter Badge -->
-                            <span id="streakBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold" title="Nghỉ 2 ngày liên tiếp không học sẽ tự động reset chuỗi về 0">
-                                <i id="streakIcon" data-lucide="flame" class="w-3.5 h-3.5 fill-amber-400"></i>
+                            <span id="streakBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold" title="Nghỉ 2 ngày liên tiếp không học sẽ tự động reset chuỗi về 0">
+                                <i id="streakIcon" data-lucide="flame" class="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400"></i>
                                 <span id="streakCountText">0 Ngày</span>
                             </span>
                         </h1>
-                        <p class="text-xs text-slate-400 hidden sm:block">Tự động hóa lịch học & Ôn tập ngắt quãng 22:00</p>
+                        <p class="text-[10px] sm:text-xs text-slate-400 hidden sm:block">Tự động hóa lịch học & Ôn tập ngắt quãng 22:00</p>
                     </div>
                 </div>
 
                 <!-- Action Controls & Cloud Sync -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                     <!-- Date Simulation Controller (Desktop) -->
                     <div class="hidden lg:flex items-center bg-slate-800/80 rounded-lg p-1 border border-slate-700 text-xs">
                         <button id="prevDayBtn" onclick="changeSimulatedDate(-1)" class="p-1.5 hover:bg-slate-700 rounded transition text-slate-300" title="Lùi 1 ngày"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
@@ -62,19 +62,20 @@
                     </div>
 
                     <!-- Cloud Auto-Sync Status Button -->
-                    <button id="cloudSyncBtn" onclick="openSyncModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950/60 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-700/50 transition">
-                        <i data-lucide="cloud-cog" class="w-4 h-4 text-indigo-400"></i>
-                        <span id="cloudSyncStatusText">Mã Đồng Bộ Cloud</span>
+                    <button id="cloudSyncBtn" onclick="openSyncModal()" class="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-indigo-950/60 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-700/50 transition">
+                        <i data-lucide="cloud-cog" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400"></i>
+                        <span id="cloudSyncStatusText" class="hidden sm:inline">Mã Đồng Bộ</span>
+                        <span class="sm:hidden">Sync</span>
                     </button>
 
                     <!-- Backup / Restore Dropdown -->
                     <div class="relative group">
-                        <button class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 transition" title="Quản lý dữ liệu">
+                        <button class="p-1.5 sm:p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 transition" title="Quản lý dữ liệu">
                             <i data-lucide="hard-drive" class="w-4 h-4"></i>
                         </button>
                         <div class="absolute right-0 mt-1 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-xl py-2 hidden group-hover:block z-50 text-xs">
                             <button onclick="exportData()" class="w-full text-left px-4 py-2 hover:bg-slate-800 text-slate-200 flex items-center gap-2">
-                                <i data-lucide="download" class="w-3.5 h-3.5 text-sky-400"></i> Tải File Backup thủ công
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-sky-400"></i> Tải File Backup
                             </button>
                             <label class="w-full text-left px-4 py-2 hover:bg-slate-800 text-slate-200 flex items-center gap-2 cursor-pointer">
                                 <i data-lucide="upload" class="w-3.5 h-3.5 text-emerald-400"></i> Nạp File Backup
@@ -87,7 +88,7 @@
                     </div>
 
                     <!-- Pause / Shift Button -->
-                    <button id="pauseDayToggleBtn" onclick="togglePauseCurrentDay()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition border shadow-sm">
+                    <button id="pauseDayToggleBtn" onclick="togglePauseCurrentDay()" class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition border shadow-sm">
                         <!-- Injected via JavaScript -->
                     </button>
                 </div>
@@ -621,7 +622,12 @@
                 const saved = localStorage.getItem('srs_planner_app_state');
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    return { ...DEFAULT_STATE, ...parsed };
+                    return { 
+                        ...DEFAULT_STATE, 
+                        ...parsed,
+                        progress: { ...DEFAULT_STATE.progress, ...(parsed.progress || {}) },
+                        baseline: { ...DEFAULT_STATE.baseline, ...(parsed.baseline || {}) }
+                    };
                 }
             } catch (e) {
                 console.error("Failed to load state", e);
@@ -630,9 +636,13 @@
         }
 
         function saveState() {
-            localStorage.setItem('srs_planner_app_state', JSON.stringify(appState));
-            if (appState.syncKey) {
-                pushStateToCloud(appState.syncKey, appState);
+            try {
+                localStorage.setItem('srs_planner_app_state', JSON.stringify(appState));
+                if (appState.syncKey) {
+                    pushStateToCloud(appState.syncKey, appState);
+                }
+            } catch (e) {
+                console.error("Failed to save state", e);
             }
         }
 
@@ -726,7 +736,6 @@
             }
 
             // 2. Check "Đề Anh THPT" (Once every 2 active days)
-            // Determine active day index up to dateStr
             const deProg = appState.progress.deAnhTHPT;
             const deTitle = CURRICULUM.deAnhTHPT[deProg.index % CURRICULUM.deAnhTHPT.length];
             tasks.push({
@@ -807,7 +816,6 @@
                 const isPaused = appState.pausedDates.includes(dateStr);
 
                 if (isPaused) {
-                    // Frozen day: skip from breaking streak
                     d.setDate(d.getDate() - 1);
                     continue;
                 }
@@ -818,11 +826,9 @@
                     streak++;
                     missedConsecutiveDays = 0;
                 } else {
-                    // Missed day
                     if (dateStr < appState.currentSimulatedDate) {
                         missedConsecutiveDays++;
                         if (missedConsecutiveDays >= 2) {
-                            // Reset streak if 2 consecutive days missed!
                             break;
                         }
                     }
@@ -987,11 +993,11 @@
             const isPaused = appState.pausedDates.includes(dateStr);
             const pauseBtn = document.getElementById('pauseDayToggleBtn');
             if (isPaused) {
-                pauseBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 border border-amber-400 transition shadow";
-                pauseBtn.innerHTML = `<i data-lucide="play-circle" class="w-4 h-4"></i> Hủy Hoãn Ngày`;
+                pauseBtn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 border border-amber-400 transition shadow";
+                pauseBtn.innerHTML = `<i data-lucide="play-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline">Hủy Hoãn</span><span class="sm:hidden">Hủy</span>`;
             } else {
-                pauseBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition";
-                pauseBtn.innerHTML = `<i data-lucide="pause-circle" class="w-4 h-4"></i> Hoãn Ngày / Xin Nghỉ (+1)`;
+                pauseBtn.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition";
+                pauseBtn.innerHTML = `<i data-lucide="pause-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i> <span class="hidden sm:inline">Hoãn Ngày (+1)</span><span class="sm:hidden">Hoãn (+1)</span>`;
             }
 
             // Streak Badge
@@ -1000,10 +1006,10 @@
             const streakIcon = document.getElementById('streakIcon');
             if (streak > 0) {
                 streakIcon.setAttribute('data-lucide', 'flame');
-                streakIcon.className = "w-3.5 h-3.5 fill-amber-400 text-amber-500";
+                streakIcon.className = "w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-500";
             } else {
                 streakIcon.setAttribute('data-lucide', 'snowflake');
-                streakIcon.className = "w-3.5 h-3.5 text-sky-400";
+                streakIcon.className = "w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-400";
             }
         }
 
@@ -1089,7 +1095,6 @@
             document.getElementById('srsDueTodayCount').textContent = dueTasks.length.toString();
             document.getElementById('srsCountBadge').textContent = dueTasks.length.toString();
 
-            // Overdue Notice Banner on main tab
             const overdueBanner = document.getElementById('overdueNoticeBanner');
             if (dueTasks.length > 0) {
                 overdueBanner.classList.remove('hidden');
@@ -1098,26 +1103,24 @@
                 overdueBanner.classList.add('hidden');
             }
 
-            // Formatted 22:00 mandatory list display [Môn/Bài]
             const formattedContainer = document.getElementById('srsListFormatted');
             if (dueTasks.length === 0) {
                 formattedContainer.innerHTML = `<p class="text-slate-500 italic text-xs">Không có bài nào cần ôn tập vào lúc 22:00 hôm nay. Tuyệt vời!</p>`;
             } else {
                 formattedContainer.innerHTML = dueTasks.map((item) => `
-                    <div class="flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800 text-xs">
-                        <div class="flex items-center gap-2">
+                    <div class="flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800 text-xs gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-amber-400 font-bold">[${getSubjectDisplayName(item.subjectKey)}]</span>
                             <span class="text-slate-200">${item.lessonTitle}</span>
                             <span class="px-1.5 py-0.5 rounded text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-800">Mốc +${item.intervalDays}d</span>
                         </div>
-                        <button onclick="toggleSrsComplete('${item.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-sans font-medium text-[11px] transition">
-                            ✓ Hoàn thành ôn
+                        <button onclick="toggleSrsComplete('${item.id}')" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-sans font-medium text-[11px] transition">
+                            ✓ Hoàn thành
                         </button>
                     </div>
                 `).join('');
             }
 
-            // Table of all SRS tasks
             const tbody = document.getElementById('srsTableBody');
             if (appState.srsTasks.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Chưa có mốc ôn tập ngắt quãng nào. Hãy hoàn thành Task bài học để kích hoạt SRS!</td></tr>`;
@@ -1295,11 +1298,11 @@
             if (appState.syncKey) {
                 banner.textContent = `Trạng thái: Đã kết nối mã "${appState.syncKey}"`;
                 banner.className = "text-[11px] font-mono text-emerald-400 bg-emerald-950/50 p-2.5 rounded-lg border border-emerald-800";
-                statusText.textContent = `Cloud: ${appState.syncKey}`;
+                statusText.textContent = `Sync: ${appState.syncKey}`;
             } else {
                 banner.textContent = "Trạng thái: Chưa kết nối mã đồng bộ nào.";
                 banner.className = "text-[11px] font-mono text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800";
-                statusText.textContent = "Mã Đồng Bộ Cloud";
+                statusText.textContent = "Mã Đồng Bộ";
             }
         }
 
@@ -1322,7 +1325,6 @@
 
         async function pushStateToCloud(syncKey, stateData) {
             try {
-                // Sync via JsonStorage / KV store simulation
                 localStorage.setItem(`cloud_sync_${syncKey}`, JSON.stringify(stateData));
             } catch (err) {
                 console.error("Cloud push failed", err);
@@ -1409,17 +1411,28 @@
         }
 
         function renderAllViews() {
-            renderHeaderDate();
-            renderTasksView();
-            renderSrsView();
-            renderScoresView();
-            renderCurriculumView();
-            if (window.lucide) lucide.createIcons();
+            try {
+                renderHeaderDate();
+                renderTasksView();
+                renderSrsView();
+                renderScoresView();
+                renderCurriculumView();
+                if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.error("Render error:", e);
+            }
         }
 
         window.onload = function() {
-            document.getElementById('scoreDate').value = getTodayStr();
-            renderAllViews();
+            try {
+                const scoreDateEl = document.getElementById('scoreDate');
+                if (scoreDateEl) scoreDateEl.value = getTodayStr();
+                renderAllViews();
+            } catch (e) {
+                console.error("Window load error:", e);
+            }
         };
     </script>
 </body>
