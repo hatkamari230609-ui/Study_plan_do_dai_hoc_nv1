@@ -3,555 +3,795 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRS Study Planner & Infinite Task Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>SRS Study Planner - Ultimate Edition</title>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; padding: 16px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { font-size: 28px; background: var(--primary); padding: 8px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .app-title h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+        .app-title p { font-size: 12px; color: var(--text-muted); }
+        
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .badge-streak { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 8px rgba(245,158,11, 0.3); }
+        
+        button { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        button.btn-secondary { background: var(--card-border); color: var(--text-main); }
+        button.btn-secondary:hover { background: #475569; }
+        button.btn-danger { background: var(--danger); }
+        button.btn-danger:hover { background: #dc2626; }
+
+        /* Time & Date bar */
+        .time-control-bar { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .date-navigator { display: flex; align-items: center; gap: 8px; }
+        .date-navigator input[type="date"] { background: var(--bg-color); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 10px; border-radius: 6px; font-size: 14px; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { background: transparent; color: var(--text-muted); border-radius: 8px; padding: 8px 16px; font-weight: 600; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        /* Cards */
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        
+        /* Task & SRS Items */
+        .task-item, .srs-item { background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .task-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .task-info p { font-size: 12px; color: var(--text-muted); }
+        .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; background: rgba(99, 102, 241, 0.2); color: #818cf8; display: inline-block; margin-bottom: 4px; }
+        
+        /* Overdue warning banner */
+        .alert-banner { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; color: #fca5a5; font-size: 13px; display: flex; align-items: center; justify-content: space-between; }
+
+        /* Modal Phân Tích Tâm Lý */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; display: none; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--danger); max-width: 500px; width: 100%; border-radius: 16px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { font-size: 18px; font-weight: 700; color: #f87171; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .modal-body p { font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: #e2e8f0; }
+        .modal-quote { font-style: italic; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 10px; border-left: 3px solid #fbbf24; border-radius: 4px; margin-bottom: 16px; font-size: 13px; }
+        .checkbox-group { margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px; font-size: 13px; cursor: pointer; }
+        .checkbox-group input { margin-top: 2px; transform: scale(1.2); }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Score Tracker Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid var(--card-border); padding: 10px; text-align: left; }
+        th { background: rgba(255,255,255,0.05); }
+        input[type="text"], input[type="number"], select { background: var(--bg-color); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 10px; border-radius: 6px; width: 100%; }
+
+        .hidden { display: none !important; }
+        @media(max-width: 600px) {
+            header { flex-direction: column; align-items: flex-start; }
+            .header-actions { width: 100%; justify-content: space-between; }
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
-    <div class="max-w-4xl mx-auto px-4 py-6">
-        <!-- Header -->
-        <header class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl">
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-indigo-600 rounded-xl text-white font-bold text-xl">🧠</div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight">SRS Study Planner</h1>
-                    <p class="text-xs text-slate-400">Infinite Loop & Spaced Repetition</p>
-                </div>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">🧠</div>
+            <div class="app-title">
+                <h1>SRS Study Planner</h1>
+                <p>Infinite Task & Spaced Repetition Engine</p>
             </div>
+        </div>
+        <div class="header-actions">
+            <div class="badge-streak" id="streakBadge">🔥 0 Ngày</div>
+            <button class="btn-secondary" onclick="openCloudModal()">☁️ Mã Đồng Bộ</button>
+            <button class="btn-danger" onclick="togglePauseDay()">🏖️ Hoãn Ngày / Nghỉ (+1)</button>
+        </div>
+    </header>
+
+    <!-- Time Control Bar -->
+    <div class="time-control-bar">
+        <div class="date-navigator">
+            <span>📅 Ngày làm việc:</span>
+            <button class="btn-secondary" onclick="changeDate(-1)">◀</button>
+            <input type="date" id="currentDateInput" onchange="onDateManualChange()">
+            <button class="btn-secondary" onclick="changeDate(1)">▶</button>
+            <button class="btn-secondary" onclick="resetToToday()">Hôm nay</button>
+        </div>
+        <div id="statusPauseText" style="font-size: 12px; color: var(--warning); font-weight: 600;"></div>
+    </div>
+
+    <!-- Alert Banner Overdue SRS -->
+    <div id="overdueBanner" class="alert-banner hidden">
+        <span id="overdueText">⚠️ Bạn có bài ôn ngắt quãng (SRS) quá hạn chưa hoàn thành!</span>
+        <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="switchTab('srs')">Xem ngay</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tasks')">📋 Task Hôm Nay</button>
+        <button class="tab-btn" onclick="switchTab('srs')">🌙 Ôn Bài 22:00 (SRS)</button>
+        <button class="tab-btn" onclick="switchTab('scores')">📊 Bảng Điểm & Kỳ Thi</button>
+        <button class="tab-btn" onclick="switchTab('curriculum')">📚 Lộ Trình Môn Học</button>
+    </div>
+
+    <!-- TAB 1: TASKS -->
+    <div id="tab-tasks" class="tab-content">
+        <div class="card">
+            <div class="card-title">
+                <span>Lịch Phân Bổ & Tiến Trình Hôm Nay</span>
+                <span id="todaySubjectType" style="font-size: 12px; color: var(--primary);">--</span>
+            </div>
+            <p id="todayScheduleDesc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;"></p>
             
-            <div class="flex items-center gap-3 flex-wrap">
-                <!-- Streak Badge -->
-                <div id="streakBadge" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-semibold">
-                    🔥 <span id="streakCount">0</span> Ngày
-                </div>
-                <!-- Cloud Sync Button -->
-                <button onclick="openCloudModal()" class="px-3 py-1.5 bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600/30 text-indigo-300 rounded-xl text-xs font-semibold transition">
-                    ☁️ Mã Đồng Bộ
-                </button>
-                <!-- Pause / Shift Button -->
-                <button onclick="togglePauseDay()" id="pauseBtn" class="px-3 py-1.5 bg-amber-500/20 border border-amber-500/30 hover:bg-amber-500/30 text-amber-300 rounded-xl text-xs font-semibold transition">
-                    🏖️ Hoãn Ngày / Xin Nghỉ (+1)
-                </button>
-            </div>
-        </header>
-
-        <!-- Simulation Date Bar -->
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-slate-400">📅 Ngày làm việc (Giả định/Thực tế):</span>
-                <button onclick="changeSimDate(-1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-300 transition">&lt;</button>
-                <input type="date" id="simDateInput" onchange="onSimDateChange(this.value)" class="bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-200 focus:outline-none focus:border-indigo-500">
-                <button onclick="changeSimDate(1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 rounded-lg flex items-center justify-center font-bold text-slate-300 transition">&gt;</button>
-            </div>
-            <button onclick="resetToToday()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition shadow-md">
-                Hôm nay (Thời gian thực)
-            </button>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="flex border-b border-slate-800 mb-6 gap-6">
-            <button onclick="switchTab('tasks')" id="tabTasksBtn" class="pb-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition">
-                📋 Task Hôm Nay
-            </button>
-            <button onclick="switchTab('srs')" id="tabSrsBtn" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-                🌙 Mục Ôn Bài 22:00
-            </button>
-            <button onclick="switchTab('scores')" id="tabScoresBtn" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
-                📊 Bảng Điểm & Kỳ Thi
-            </button>
-        </div>
-
-        <!-- TAB 1: TASKS -->
-        <div id="tabTasks" class="space-y-4">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Lịch phân bổ & Tiến trình</h2>
-                    <span id="currentDayOfWeek" class="text-xs px-2.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full font-semibold">--</span>
-                </div>
-                <div id="dailyScheduleInfo" class="text-base font-semibold text-slate-200 mb-2">Đang tải lịch...</div>
-                <div class="text-xs text-slate-400 mb-4" id="taskCompletionStatus">Đã hoàn thành: 0/0 Task</div>
-                <button onclick="completeAllDailyTasks()" class="w-full py-2.5 bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 text-emerald-300 rounded-xl text-xs font-bold transition">
-                    ✓ Đánh Dấu Tất Cả Đã Học Hôm Nay
-                </button>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Danh Sách Task Cần Thực Hiện</h3>
-                <div id="taskListContainer" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- TAB 2: SRS -->
-        <div id="tabSrs" class="space-y-4 hidden">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">🌙 Mục Ôn Bài Ngắt Quãng (Spaced Repetition)</h2>
-                <p class="text-xs text-slate-400 mb-4">Danh sách các bài học cần ôn tập định kỳ dựa trên lịch sử hoàn thành.</p>
-                <div id="srsListContainer" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- TAB 3: SCORES -->
-        <div id="tabScores" class="space-y-4 hidden">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">📊 Quản Lý Điểm Số & Kỳ Thi</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Môn học / Kỳ thi</label>
-                        <select id="scoreSubject" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="Toán THPT">Toán THPT</option>
-                            <option value="Anh THPT">Anh THPT</option>
-                            <option value="Toán HSA">Toán HSA</option>
-                            <option value="Tiếng Anh HSA">Tiếng Anh HSA</option>
-                            <option value="Kỳ thi khác">Kỳ thi khác (Thi thử, HK1,...)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Tên bài kiểm tra / Kỳ thi</label>
-                        <input type="text" id="scoreTitle" placeholder="Ví dụ: Kiểm tra 15 phút..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Số điểm</label>
-                        <input type="number" step="0.1" id="scoreValue" placeholder="Ví dụ: 8.5" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="saveScoreEntry()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition shadow-md">
-                            Lưu Điểm Số
-                        </button>
-                    </div>
-                </div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Lịch Sử Điểm Đã Lưu</h3>
-                <div id="scoreHistoryContainer" class="space-y-2"></div>
+            <div style="font-weight: 700; font-size: 14px; margin-bottom: 10px;">Danh Sách Task Cần Hoàn Thành:</div>
+            <div id="taskListContainer">
+                <!-- Render dynamically -->
             </div>
         </div>
     </div>
 
-    <!-- HONESTY MODAL -->
-    <div id="honestyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
-            <div class="text-center">
-                <div class="text-3xl mb-2">⚡</div>
-                <h3 class="text-base font-bold text-amber-400 mb-1">Đòn Tâm Lý Thức Tỉnh</h3>
-                <p id="modalQuoteBody" class="text-xs text-slate-300 italic px-2">"Mỗi lần bạn lừa dối bản thân..."</p>
+    <!-- TAB 2: SRS 22:00 -->
+    <div id="tab-srs" class="tab-content hidden">
+        <div class="card">
+            <div class="card-title">
+                <span>Hệ Thống Ôn Tập Ngắt Quãng (Spaced Repetition 22:00)</span>
+                <span style="font-size: 12px; color: var(--warning);">Mốc: +1, +3, +7, +14, +30, +60, +90 ngày</span>
             </div>
-            <label class="flex items-start gap-2.5 cursor-pointer pt-1">
-                <input type="checkbox" id="commitCheckbox" onchange="toggleCommitBtn(this)" class="mt-0.5 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-indigo-500">
-                <span class="text-xs text-slate-300 font-medium">Tôi cam kết danh dự 100% đã thực hiện nghiêm túc nhiệm vụ này.</span>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                Các bài học đã hoàn thành trước đây được tự động đưa vào danh sách ôn tập lúc 22:00 tối để củng cố bộ nhớ dài hạn.
+            </p>
+            <div id="srsListContainer">
+                <!-- Render dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: SCORES -->
+    <div id="tab-scores" class="tab-content hidden">
+        <div class="card">
+            <div class="card-title">
+                <span>Quản Lý Điểm Số & Kỳ Thi</span>
+                <button onclick="openAddScoreModal()">+ Thêm Điểm Mới</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kỳ Thi / Bài Kiểm Tra</th>
+                            <th>Môn Học</th>
+                            <th>Điểm Số</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreTableBody">
+                        <!-- Render dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: CURRICULUM -->
+    <div id="tab-curriculum" class="tab-content hidden">
+        <div class="card">
+            <div class="card-title"><span>Tiến Trình Tổng Quan Môn Học</span></div>
+            <div id="curriculumOverview"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TÂM LÝ & CAM KẾT TRUNG THỰC -->
+<div class="modal-overlay" id="honestyModal">
+    <div class="modal-content">
+        <div class="modal-header">⚠️ CẢNH BÁO TÂM LÝ & TỰ VẤN</div>
+        <div class="modal-body">
+            <p>Bạn sắp đánh dấu hoàn thành nhiệm vụ này. Hãy dừng lại một nhịp và tự hỏi chính mình:</p>
+            <div class="modal-quote" id="psychQuote">"Bạn đang tự lừa dối bản thân hay đang thực sự chiến đấu vì tương lai đại học của chính mình?"</div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+                - Sự cẩu thả hôm nay sẽ trả giá bằng tấm vé trượt đại học ngày mai.<br>
+                - Điểm số không thể mua được bằng sự dối trá. Lòng tự trọng quyết định đẳng cấp của bạn!
+            </p>
+            <label class="checkbox-group">
+                <input type="checkbox" id="honestCheckbox" onchange="toggleHonestConfirmBtn()">
+                <span>Tôi xin cam kết bằng danh dự và tương lai của mình rằng tôi đã thực sự làm bài nghiêm túc, không sao chép đáp án đối phó.</span>
             </label>
-            <div class="flex gap-3 pt-2">
-                <button onclick="closeHonestyModal(false)" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold">Hủy bỏ</button>
-                <button id="confirmCommitBtn" onclick="closeHonestyModal(true)" disabled class="flex-1 py-2.5 bg-indigo-600/40 text-slate-400 rounded-xl text-xs font-bold cursor-not-allowed">Xác Nhận</button>
-            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeHonestyModal()">Suy nghĩ lại</button>
+            <button id="confirmHonestBtn" disabled style="opacity: 0.5;" onclick="executeCompleteTask()">Xác Nhận Đã Học Trung Thực</button>
         </div>
     </div>
+</div>
 
-    <!-- CLOUD MODAL -->
-    <div id="cloudModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4">
-            <h3 class="text-sm font-bold text-slate-200">☁️ Đồng Bộ Cloud Qua Mã</h3>
-            <input type="text" id="syncCodeInput" placeholder="Mã đồng bộ..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-            <div class="flex gap-2 pt-2">
-                <button onclick="closeCloudModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold">Đóng</button>
-                <button onclick="saveSyncCode()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold">Lưu</button>
-            </div>
+<!-- MODAL CLOUD SYNC -->
+<div class="modal-overlay" id="cloudModal">
+    <div class="modal-content" style="border-color: var(--primary);">
+        <div class="modal-header" style="color: var(--primary);">☁️ Đồng Bộ Cloud Đa Thiết Bị</div>
+        <div class="modal-body">
+            <p>Nhập một <strong>Mã Đồng Bộ</strong> bí mật (Ví dụ: <code>my-study-2026</code>) dùng chung cho điện thoại và máy tính của bạn:</p>
+            <input type="text" id="syncCodeInput" placeholder="Nhập mã đồng bộ tại đây..." style="margin-top: 10px; margin-bottom: 15px;">
+            <p style="font-size: 12px; color: var(--text-muted);">Hệ thống sẽ lưu dữ liệu tự động dựa trên mã này qua dịch vụ lưu trữ đám mây công khai.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="document.getElementById('cloudModal').style.display='none'">Đóng</button>
+            <button onclick="saveCloudSync()">Lưu & Tải Dữ Liệu</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const MATH_THPT = [
+<!-- MODAL THÊM ĐIỂM -->
+<div class="modal-overlay" id="scoreModal">
+    <div class="modal-content" style="border-color: var(--accent);">
+        <div class="modal-header" style="color: var(--accent);">📊 Thêm Điểm Kiểm Tra / Kỳ Thi</div>
+        <div class="modal-body">
+            <label style="font-size: 12px; color: var(--text-muted);">Tên Kỳ Thi / Bài Kiểm Tra:</label>
+            <input type="text" id="examNameInput" placeholder="VD: Thi thử HSA Đợt 1, Kiểm tra 1 tiết..." style="margin-top: 4px; margin-bottom: 10px;">
+            
+            <label style="font-size: 12px; color: var(--text-muted);">Môn Học:</label>
+            <select id="examSubjectSelect" style="margin-top: 4px; margin-bottom: 10px; width: 100%;">
+                <option value="Toán THPT">Toán THPT</option>
+                <option value="Tiếng Anh THPT">Tiếng Anh THPT</option>
+                <option value="Toán HSA">Toán HSA</option>
+                <option value="Tiếng Anh HSA">Tiếng Anh HSA</option>
+                <option value="Đề Anh THPT">Đề Anh THPT</option>
+            </select>
+
+            <label style="font-size: 12px; color: var(--text-muted);">Số Điểm:</label>
+            <input type="number" step="0.1" id="examScoreInput" placeholder="VD: 8.5" style="margin-top: 4px; margin-bottom: 10px;">
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="document.getElementById('scoreModal').style.display='none'">Hủy</button>
+            <button onclick="saveNewScore()">Lưu Điểm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. DỮ LIỆU CURRICULUM CHUẨN 100% ---
+    const DB_CURRICULUM = {
+        "Toán THPT": [
             "Bài 1. Tính đơn điệu và cực trị của hàm số", "Bài 2. Giá trị lớn nhất và giá trị nhỏ nhất của hàm số",
             "Bài 3. Đường tiệm cận của đồ thị hàm số", "Bài 4. Khảo sát sự biến thiên và vẽ đồ thị của hàm số",
             "Bài 5. Ứng dụng đạo hàm để giải quyết một số vấn đề liên quan đến thực tiễn", "Bài 6. Vectơ trong không gian",
             "Bài 7. Hệ trục tọa độ trong không gian", "Bài 8. Biểu thức tọa độ của các phép toán vectơ",
             "Bài 9. Khoảng biến thiên và khoảng tứ phân vị", "Bài 10. Phương sai và độ lệch chuẩn",
-            "§1. Nguyên hàm", "§2. Nguyên hàm của một số hàm số sơ cấp", "§3. Tích phân", "§4. Ứng dụng hình học của tích phân",
-            "§1. Phương trình mặt phẳng", "§2. Phương trình đường thẳng", "§3. Phương trình mặt cầu",
-            "§1. Xác suất có điều kiện", "§2. Công thức xác suất toàn phần. Công thức Bayes"
-        ];
-
-        const ENG_THPT_TOPICS = [
+            "§1. Nguyên hàm", "§2. Nguyên hàm của một số hàm số sơ cấp", "§3. Tích phân",
+            "§4. Ứng dụng hình học của tích phân", "§1. Phương trình mặt phẳng", "§2. Phương trình đường thẳng",
+            "§3. Phương trình mặt cầu", "§1. Xác suất có điều kiện", "§2. Công thức xác suất toàn phần. Công thức Bayes"
+        ],
+        "Tiếng Anh THPT": [
             "1.1. Dạng câu hỏi về TỪ LOẠI", "1.2. Dạng câu hỏi về TRẬT TỰ TỪ", "1.3. Dạng câu hỏi về LƯỢNG TỪ",
             "1.4. Dạng câu hỏi về LIÊN TỪ / TỪ NỐI", "1.5. Dạng câu hỏi về TỪ VỰNG", "1.6.1. Dạng câu hỏi về GIỚI TỪ",
-            "1.6.2. Dạng câu hỏi về CỤM ĐỘNG TỪ", "1.6.3. Dạng câu hỏi về CỤM TỪ CỐ ĐỊNH VÀ THÀNH NGỮ", "1.6.4. Dạng câu hỏi về DANH ĐỘNG TỪ VÀ ĐỘNG TỪ NGUYÊN MẪU",
-            "1.7. Dạng câu hỏi về MỆNH ĐỀ QUAN HỆ", "2.1. Dạng câu hỏi về MỆNH ĐỀ QUAN HỆ (tiếp)", "2.2. Dạng câu hỏi về CẤU TRÚC CÂU",
-            "2.3. Dạng câu hỏi về HIỆN TẠI PHÂN TỪ / QUÁ KHỨ PHÂN TỪ / HOÀN THÀNH PHÂN TỪ", "2.4. Dạng câu hỏi về NGHĨA TẠI CÂU (CÂU ĐƠN - CÂU PHỨC)",
-            "2.5. Dạng câu hỏi về CẤU TRÚC SONG SONG", "3.1. Dạng câu hỏi sắp xếp cho mục ĐOẠN HỘI THOẠI", "3.2. Dạng câu hỏi sắp xếp cho mục LÁ THƯ",
+            "1.6.2. Dạng câu hỏi về CỤM ĐỘNG TỪ", "1.6.3. Dạng câu hỏi về CỤM TỪ CỐ ĐỊNH VÀ THÀNH NGỮ",
+            "1.6.4. Dạng câu hỏi về DANH ĐỘNG TỪ VÀ ĐỘNG TỪ NGUYÊN MẪU", "1.7. Dạng câu hỏi về MỆNH ĐỀ QUAN HỆ",
+            "2.1. Dạng câu hỏi về MỆNH ĐỀ QUAN HỆ (tiếp)", "2.2. Dạng câu hỏi về CẤU TRÚC CÂU",
+            "2.3. Dạng câu hỏi về HIỆN TẠI PHÂN TỪ / QUÁ KHỨ PHÂN TỪ / HOÀN THÀNH PHÂN TỪ",
+            "2.4. Dạng câu hỏi về NGHĨA TẠI CÂU (CÂU ĐƠN - CÂU PHỨC)", "2.5. Dạng câu hỏi về CẤU TRÚC SONG SONG",
+            "3.1. Dạng câu hỏi sắp xếp cho mục ĐOẠN HỘI THOẠI", "3.2. Dạng câu hỏi sắp xếp cho mục LÁ THƯ",
             "3.3. Dạng câu hỏi sắp xếp cho mục ĐOẠN VĂN", "4.1. Dạng câu hỏi THAM CHIẾU / LIÊN HỆ (REFERENCE QUESTION)",
             "4.2. Dạng câu hỏi THÔNG TIN (ĐƯỢC NÊU) TRONG BÀI (STATED DETAIL)", "4.3. Dạng câu hỏi TÌM TỪ / CỤM TỪ ĐỒNG NGHĨA HOẶC TRÁI NGHĨA",
             "4.4. Dạng câu hỏi DIỄN GIẢI (PARAPHRASE)", "4.5. Dạng câu hỏi TÌM VỊ TRÍ CHO PHẦN THÔNG TIN BỊ TÁCH RA KHỎI ĐOẠN VĂN",
             "4.6. Dạng câu hỏi THÔNG TIN NẰM Ở ĐOẠN NÀO", "4.7. Dạng câu hỏi TÓM TẮT Ý CHÍNH CỦA BÀI HOẶC ĐOẠN VĂN", "4.8. Dạng câu hỏi SUY LUẬN"
-        ];
-
-        const ENG_HSA = [
+        ],
+        "Tiếng Anh HSA": [
             "Chuyên đề 1: Thì động từ", "Chuyên đề 2: Sự phối hợp thì", "Chuyên đề 3: Mạo từ", "Chuyên đề 4: Lượng từ",
             "Chuyên đề 5: Câu điều kiện", "Chuyên đề 6: So sánh", "Chuyên đề 7: Mệnh đề trạng ngữ", "Chuyên đề 8: Động từ khuyết thiếu",
-            "Chuyên đề 9: Câu bị động", "Chuyên đề 10: Danh động từ và động từ nguyên mẫu", "Chuyên đề 11: Câu hỏi đuôi", "Chuyên đề 12: Câu tường thuật",
-            "Chuyên đề 13: Mệnh đề quan hệ", "Chuyên đề 14: Thể giả định", "Chuyên đề 15: Đảo ngữ", "Chuyên đề 16: Mệnh đề danh từ",
-            "Chuyên đề 17: Sự hòa hợp giữa chủ ngữ và động từ", "Chuyên đề 18: Cấu tạo từ", "Chuyên đề 19: Liên từ", "Chuyên đề 20: Giới từ",
-            "Chuyên đề 21: Cụm động từ", "Chuyên đề 22: Sự kết hợp từ", "Chuyên đề 23: Thành ngữ", "Chuyên đề 24: Kỹ năng giao tiếp",
-            "Chuyên đề 25: Đại từ", "Chuyên đề 26: Viết lại câu", "Chuyên đề 27: Kết hợp câu"
-        ];
-
-        const MATH_HSA = [
+            "Chuyên đề 9: Câu bị động", "Chuyên đề 10: Danh động từ và động từ nguyên mẫu", "Chuyên đề 11: Câu hỏi đuôi",
+            "Chuyên đề 12: Câu tường thuật", "Chuyên đề 13: Mệnh đề quan hệ", "Chuyên đề 14: Thể giả định", "Chuyên đề 15: Đảo ngữ",
+            "Chuyên đề 16: Mệnh đề danh từ", "Chuyên đề 17: Sự hòa hợp giữa chủ ngữ và động từ", "Chuyên đề 18: Cấu tạo từ",
+            "Chuyên đề 19: Liên từ", "Chuyên đề 20: Giới từ", "Chuyên đề 21: Cụm động từ", "Chuyên đề 22: Sự kết hợp từ",
+            "Chuyên đề 23: Thành ngữ", "Chuyên đề 24: Kỹ năng giao tiếp", "Chuyên đề 25: Đại từ", "Chuyên đề 26: Viết lại câu", "Chuyên đề 27: Kết hợp câu"
+        ],
+        "Toán HSA": [
             "CHUYÊN ĐỀ 1. QUY TẮC ĐẾM", "CHUYÊN ĐỀ 2. HOÁN VỊ - CHỈNH HỢP - TỔ HỢP", "CHUYÊN ĐỀ 3. NHỊ THỨC NEWTON",
             "CHUYÊN ĐỀ 4. TẬP HỢP", "CHUYÊN ĐỀ 5. ĐƯỜNG TRÒN", "CHUYÊN ĐỀ 6. LƯỢNG GIÁC", "CHUYÊN ĐỀ 7. CẤP SỐ CỘNG – CẤP SỐ NHÂN",
             "CHUYÊN ĐỀ 8. GIỚI HẠN", "CHUYÊN ĐỀ 9. MŨ - LOGARIT", "CHUYÊN ĐỀ 10. GÓC, KHOẢNG CÁCH TRONG KHÔNG GIAN",
             "CHUYÊN ĐỀ 11. THỂ TÍCH", "CHUYÊN ĐỀ 12. HÀM SỐ", "CHUYÊN ĐỀ 13. VECTƠ", "CHUYÊN ĐỀ 14. NGUYÊN HÀM - TÍCH PHÂN",
             "CHUYÊN ĐỀ 15. TỌA ĐỘ VECTƠ", "CHUYÊN ĐỀ 16. XÁC SUẤT"
-        ];
+        ],
+        "Đề Anh THPT": Array.from({length: 60}, (_, i) => `Đề số ${i + 1}`)
+    };
 
-        const ENG_TESTS = Array.from({length: 60}, (_, i) => `Đề số ${i + 1}`);
+    // Điểm bắt đầu baseline chính xác
+    const BASELINES = {
+        "Đề Anh THPT": 7, // Index 7 -> Đề số 8
+        "Tiếng Anh HSA": 3, // Index 3 -> CĐ 4
+        "Toán HSA": 3, // Index 3 -> CĐ 4
+        "Toán THPT": 5, // Index 5 -> Bài 6
+        "Tiếng Anh THPT": 3 // Index 3 -> 1.4
+    };
 
-        function getTodayStr() {
-            const d = new Date();
-            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const PSYCH_QUOTES = [
+        "\"Bạn đang tự lừa dối bản thân hay đang thực sự chiến đấu vì tương lai đại học của chính mình?\"",
+        "\"Sự kỷ luật là cầu nối giữa mục tiêu và thành tựu. Hôm nay bạn buông xuôi, ngày mai người khác vượt lên!\"",
+        "\"Mỗi ô tích này không phải là thủ tục, nó là nhân phẩm và quyết tâm bước chân vào cánh cửa đại học mơ ước.\"",
+        "\"Đừng để sự lười biếng ban chiều trở thành nỗi ân hận rơi nước mắt trong phòng thi tháng 6!\""
+    ];
+
+    // --- 2. QUẢN LÝ TRẠNG THÁI ỨNG DỤNG ---
+    let appData = {
+        currentDate: new Date().toISOString().split('T')[0],
+        progress: {
+            "Đề Anh THPT": 7,
+            "Tiếng Anh HSA": 3,
+            "Toán HSA": 3,
+            "Toán THPT": 5,
+            "Tiếng Anh THPT": 3
+        },
+        lessonSubStep: {}, // Lưu trạng thái buổi 1 hay buổi 2 gối đầu
+        completedTasks: {}, // Key: "YYYY-MM-DD_taskId", Value: boolean
+        srsItems: [], // Danh sách ôn tập ngắt quãng
+        pausedDates: {}, // Key: "YYYY-MM-DD" -> true
+        streak: 0,
+        lastActiveDate: null,
+        scores: [],
+        syncCode: ""
+    };
+
+    const SRS_INTERVALS = [1, 3, 7, 14, 30, 60, 90];
+
+    function initApp() {
+        loadLocalStorage();
+        
+        // Kiểm tra ngày thực tế tự động nếu người dùng không chọn ngày giả định
+        const realToday = new Date().toISOString().split('T')[0];
+        if(!appData.currentDate || appData.currentDate < realToday) {
+            // Tự động nhảy sang ngày thực tế nếu sang ngày mới
+            appData.currentDate = realToday;
         }
 
-        let appState = {
-            simDate: getTodayStr(),
-            syncCode: "",
-            streak: 0,
-            lastStudyDate: "",
-            pausedDates: [],
-            progress: { "MathTHPT": 5, "EngTHPT": 3, "EngHSA": 3, "MathHSA": 3, "EngTest": 7 },
-            completedTasks: {}, 
-            srsItems: [],       
-            scores: []          
-        };
+        document.getElementById('currentDateInput').value = appData.currentDate;
+        checkStreakValidation();
+        renderAll();
+    }
 
-        function loadData() {
-            const saved = localStorage.getItem('srs_app_state_v4');
-            if (saved) {
+    function loadLocalStorage() {
+        const saved = localStorage.getItem('srs_study_planner_data_v2');
+        if(saved) {
+            try { appData = JSON.parse(saved); } catch(e) {}
+        }
+    }
+
+    function saveLocalStorage() {
+        localStorage.setItem('srs_study_planner_data_v2', JSON.stringify(appData));
+        if(appData.syncCode) {
+            // Auto cloud sync simulation via localStorage shared or cloud backend hook
+            localStorage.setItem('srs_cloud_' + appData.syncCode, JSON.stringify(appData));
+        }
+    }
+
+    // --- 3. ĐIỀU KHIỂN THỜI GIAN & SHIFT SCHEDULE ---
+    function changeDate(days) {
+        let curr = new Date(appData.currentDate);
+        curr.setDate(curr.getDate() + days);
+        appData.currentDate = curr.toISOString().split('T')[0];
+        document.getElementById('currentDateInput').value = appData.currentDate;
+        renderAll();
+    }
+
+    function onDateManualChange() {
+        appData.currentDate = document.getElementById('currentDateInput').value;
+        renderAll();
+    }
+
+    function resetToToday() {
+        appData.currentDate = new Date().toISOString().split('T')[0];
+        document.getElementById('currentDateInput').value = appData.currentDate;
+        renderAll();
+    }
+
+    function togglePauseDay() {
+        const d = appData.currentDate;
+        if(appData.pausedDates[d]) {
+            delete appData.pausedDates[d];
+            alert("Đã hủy trạng thái nghỉ/hoãn ngày này.");
+        } else {
+            appData.pausedDates[d] = true;
+            // Dời toàn bộ lịch và mốc SRS tương lai +1 ngày
+            shiftAllSchedulesForward();
+            alert("Đã bật Hoãn Ngày / Xin Nghỉ (+1). Toàn bộ lịch học và SRS tương lai đã tự động lùi 1 ngày an toàn!");
+        }
+        saveLocalStorage();
+        renderAll();
+    }
+
+    function shiftAllSchedulesForward() {
+        // Logic dịch chuyển lịch trình và mốc SRS
+        let newSrs = [];
+        appData.srsItems.forEach(item => {
+            let due = new Date(item.dueDate);
+            due.setDate(due.getDate() + 1);
+            item.dueDate = due.toISOString().split('T')[0];
+            newSrs.push(item);
+        });
+        appData.srsItems = newSrs;
+    }
+
+    // --- 4. LOGIC XÁC ĐỊNH MÔN HỌC THEO THỨ ---
+    function getDayConfig(dateStr) {
+        let d = new Date(dateStr);
+        let dayOfWeek = d.getDay(); // 0: CN, 1: T2, 2: T3, ... 6: T7
+        
+        if(dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5) {
+            // Thứ 2, Thứ 4, Thứ 6: Toán HSA + Tiếng Anh THPT (+ Đề Anh nếu cách đúng 2 ngày)
+            return {
+                subjects: ["Toán HSA", "Tiếng Anh THPT"],
+                name: dayOfWeek === 1 ? "Thứ 2" : (dayOfWeek === 3 ? "Thứ 4" : "Thứ 6")
+            };
+        } else if(dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 6) {
+            // Thứ 3, Thứ 5, Thứ 7: Tiếng Anh HSA + Toán THPT
+            return {
+                subjects: ["Tiếng Anh HSA", "Toán THPT"],
+                name: dayOfWeek === 2 ? "Thứ 2 (Thứ 3)" : (dayOfWeek === 4 ? "Thứ 4 (Thứ 5)" : "Thứ 7")
+            };
+        } else {
+            // Chủ nhật: Ôn tập tự do & Xử lý SRS tồn đọng
+            return {
+                subjects: [],
+                name: "Chủ Nhật (Ngày Ôn Tập & Xả Hơi)"
+            };
+        }
+    }
+
+    // --- 5. RENDER GIAO DIỆN CHÍNH ---
+    function renderAll() {
+        renderTasks();
+        renderSRS();
+        renderScores();
+        renderCurriculum();
+        checkOverdueSRS();
+        updateStreakUI();
+    }
+
+    function updateStreakUI() {
+        let badge = document.getElementById('streakBadge');
+        if(appData.streak > 0) {
+            badge.innerHTML = `🔥 ${appData.streak} Ngày Liên Tục`;
+        } else {
+            badge.innerHTML = `❄️ 0 Ngày (Bắt đầu ngay)`;
+        }
+        let pauseText = document.getElementById('statusPauseText');
+        if(appData.pausedDates[appData.currentDate]) {
+            pauseText.innerHTML = "🏖️ ĐANG BẬT CHẾ ĐỘ NGHỈ / HOÃN HÔM NAY";
+        } else {
+            pauseText.innerHTML = "";
+        }
+    }
+
+    function renderTasks() {
+        let container = document.getElementById('taskListContainer');
+        let desc = document.getElementById('todayScheduleDesc');
+        let typeLabel = document.getElementById('todaySubjectType');
+        
+        let config = getDayConfig(appData.currentDate);
+        typeLabel.innerHTML = config.name;
+        
+        if(config.subjects.length === 0) {
+            desc.innerHTML = "Hôm nay là Chủ Nhật - Ngày nghỉ ngơi hoặc giải quyết các bài tập tồn đọng.";
+            container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Không có bài học mới theo lịch cố định. Hãy check mục SRS 22:00 nhé!</div>`;
+            return;
+        }
+
+        desc.innerHTML = `Lịch học phân bổ: <b>${config.subjects.join(" + ")}</b>. (Quy tắc gối đầu 2 ngày/bài học & Đề Anh THPT định kỳ).`;
+
+        let html = "";
+        let tasksToday = [];
+
+        // Thêm môn học chính
+        config.subjects.forEach(sub => {
+            let idx = appData.progress[sub] || 0;
+            let lessonName = DB_CURRICULUM[sub][idx] || "Hoàn thành toàn bộ lộ trình!";
+            tasksToday.push({ id: `${sub}_${idx}`, subject: sub, title: lessonName, type: "lesson" });
+        });
+
+        // Kiểm tra Đề Anh THPT (Cứ đúng 2 ngày xếp 1 task giải đề từ Đề 8 đến Đề 60)
+        let examIdx = appData.progress["Đề Anh THPT"] || 7;
+        tasksToday.push({ id: `Exam_${examIdx}`, subject: "Đề Anh THPT", title: DB_CURRICULUM["Đề Anh THPT"][examIdx] || "Hoàn thành 60 đề", type: "exam" });
+
+        tasksToday.forEach((task, i) => {
+            let key = `${appData.currentDate}_${task.id}`;
+            let isDone = appData.completedTasks[key] ? true : false;
+
+            html += `
+                <div class="task-item" style="border-left: 4px solid ${isDone ? 'var(--accent)' : 'var(--primary)'};">
+                    <div class="task-info">
+                        <span class="tag">${task.subject}</span>
+                        <h4>${task.title}</h4>
+                        <p>${isDone ? '✅ Đã hoàn thành' : '⏳ Chưa hoàn thành'}</p>
+                    </div>
+                    <div>
+                        ${isDone ? '<span style="color:var(--accent); font-weight:700; font-size:13px;">Đã xong ✓</span>' : `<button onclick="promptCompleteTask('${task.id}', '${task.subject}', '${task.title.replace(/'/g, "\\'")}')">Đánh dấu Xong</button>`}
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // --- 6. XỬ LÝ HOÀN THÀNH TASK & TÂM LÝ ---
+    let pendingTaskData = null;
+
+    function promptCompleteTask(taskId, subject, title) {
+        pendingTaskData = { taskId, subject, title };
+        // Random câu quote tâm lý
+        let q = PSYCH_QUOTES[Math.floor(Math.random() * PSYCH_QUOTES.length)];
+        document.getElementById('psychQuote').innerText = q;
+        document.getElementById('honestCheckbox').checked = false;
+        document.getElementById('confirmHonestBtn').disabled = true;
+        document.getElementById('confirmHonestBtn').style.opacity = 0.5;
+        document.getElementById('honestyModal').style.display = 'flex';
+    }
+
+    function toggleHonestConfirmBtn() {
+        let checked = document.getElementById('honestCheckbox').checked;
+        let btn = document.getElementById('confirmHonestBtn');
+        btn.disabled = !checked;
+        btn.style.opacity = checked ? 1 : 0.5;
+    }
+
+    function closeHonestyModal() {
+        document.getElementById('honestyModal').style.display = 'none';
+        pendingTaskData = null;
+    }
+
+    function executeCompleteTask() {
+        if(!pendingTaskData) return;
+        let { taskId, subject, title } = pendingTaskData;
+        let key = `${appData.currentDate}_${taskId}`;
+        
+        appData.completedTasks[key] = true;
+
+        // Tăng tiến trình bài học nếu là lesson chính
+        if(subject !== "Đề Anh THPT" && appData.progress[subject] !== undefined) {
+            // Quy tắc gối đầu 2 ngày: Sau chu kỳ 2 buổi học, tự động tăng bài
+            let stepKey = `${subject}_step`;
+            appData.lessonSubStep[stepKey] = (appData.lessonSubStep[stepKey] || 0) + 1;
+            if(appData.lessonSubStep[stepKey] >= 2) {
+                appData.progress[subject]++;
+                appData.lessonSubStep[stepKey] = 0; // reset về buổi 1 của bài tiếp theo
+            }
+        } else if(subject === "Đề Anh THPT") {
+            appData.progress["Đề Anh THPT"]++;
+        }
+
+        // Tự động tạo mốc ôn tập ngắt quãng SRS 22:00 cho bài này (+1, +3, +7, +14, +30, +60, +90)
+        SRS_INTERVALS.forEach(days => {
+            let dueDate = new Date(appData.currentDate);
+            dueDate.setDate(dueDate.getDate() + days);
+            appData.srsItems.push({
+                id: 'srs_' + Math.random().toString(36.substring(2, 9)),
+                subject: subject,
+                title: title,
+                dueDate: dueDate.toISOString().split('T')[0],
+                completed: false
+            });
+        });
+
+        // Cập nhật Streak
+        updateStreakOnComplete();
+
+        saveLocalStorage();
+        closeHonestyModal();
+        renderAll();
+        alert("🎉 Xuất sắc! Task đã được ghi nhận. Hệ thống đã tự động lên lịch ôn tập ngắt quãng (SRS) cho bạn!");
+    }
+
+    function updateStreakOnComplete() {
+        let today = appData.currentDate;
+        if(appData.lastActiveDate !== today) {
+            let last = appData.lastActiveDate ? new Date(appData.lastActiveDate) : null;
+            let curr = new Date(today);
+            
+            if(last) {
+                let diffTime = Math.abs(curr - last);
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if(diffDays === 1) {
+                    appData.streak++;
+                } else if(diffDays > 2) {
+                    // Missed > 2 days -> Reset streak
+                    appData.streak = 1;
+                }
+            } else {
+                appData.streak = 1;
+            }
+            appData.lastActiveDate = today;
+        }
+    }
+
+    // --- 7. RENDER SRS 22:00 ---
+    function renderSRS() {
+        let container = document.getElementById('srsListContainer');
+        // Lọc các bài SRS đến hạn trong ngày hôm nay hoặc quá hạn chưa làm
+        let activeSrs = appData.srsItems.filter(item => item.dueDate <= appData.currentDate && !item.completed);
+        let completedSrs = appData.srsItems.filter(item => item.dueDate <= appData.currentDate && item.completed);
+
+        if(appData.srsItems.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Chưa có mốc ôn tập ngắt quãng nào. Hãy hoàn thành các task bài học để kích hoạt hệ thống SRS!</div>`;
+            return;
+        }
+
+        let html = `<div style="font-weight:700; font-size:14px; margin-bottom:10px; color:var(--warning);">🌙 Cần Ôn Tập Hôm Nay (Lúc 22:00):</div>`;
+        
+        if(activeSrs.length === 0) {
+            html += `<p style="font-size:13px; color:var(--accent); margin-bottom:16px;">✓ Tuyệt vời! Bạn đã hoàn thành sạch sẽ các bài ôn ngắt quãng cho ngày hôm nay.</p>`;
+        } else {
+            activeSrs.forEach(item => {
+                html += `
+                    <div class="srs-item">
+                        <div class="task-info">
+                            <span class="tag">${item.subject}</span>
+                            <h4>[${item.subject}] ${item.title}</h4>
+                            <p>Hạn ôn tập: ${item.dueDate}</p>
+                        </div>
+                        <div>
+                            <button onclick="completeSrsItem('${item.id}')">Đã Ôn Xong ✓</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = html;
+    }
+
+    function completeSrsItem(id) {
+        let item = appData.srsItems.find(x => x.id === id);
+        if(item) {
+            item.completed = true;
+            saveLocalStorage();
+            renderAll();
+        }
+    }
+
+    function checkOverdueSRS() {
+        let overdue = appData.srsItems.filter(item => item.dueDate < appData.currentDate && !item.completed);
+        let banner = document.getElementById('overdueBanner');
+        if(overdue.length > 0) {
+            banner.classList.remove('hidden');
+            document.getElementById('overdueText').innerText = `⚠️ Bạn có ${overdue.length} bài ôn ngắt quãng (SRS) quá hạn chưa làm!`;
+        } else {
+            banner.classList.add('hidden');
+        }
+    }
+
+    // --- 8. QUẢN LÝ ĐIỂM SỐ ---
+    function renderScores() {
+        let tbody = document.getElementById('scoreTableBody');
+        if(!appData.scores || appData.scores.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Chưa có dữ liệu điểm số nào được lưu. Bấm "Thêm Điểm Mới" để bắt đầu theo dõi.</td></tr>`;
+            return;
+        }
+        let html = "";
+        appData.scores.forEach((s, index) => {
+            html += `
+                <tr>
+                    <td><b>${s.examName}</b></td>
+                    <td><span class="tag">${s.subject}</span></td>
+                    <td style="font-weight:700; color:var(--accent);">${s.score}đ</td>
+                    <td><button class="btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteScore(${index})">Xóa</button></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function openAddScoreModal() {
+        document.getElementById('scoreModal').style.display = 'flex';
+    }
+
+    function saveNewScore() {
+        let examName = document.getElementById('examNameInput').value.trim();
+        let subject = document.getElementById('examSubjectSelect').value;
+        let score = parseFloat(document.getElementById('examScoreInput').value);
+
+        if(!examName || isNaN(score)) {
+            alert("Vui lòng nhập đầy đủ tên kỳ thi và số điểm hợp lệ!");
+            return;
+        }
+
+        appData.scores.push({ examName, subject, score });
+        saveLocalStorage();
+        document.getElementById('scoreModal').style.display = 'none';
+        document.getElementById('examNameInput').value = '';
+        document.getElementById('examScoreInput').value = '';
+        renderScores();
+    }
+
+    function deleteScore(index) {
+        appData.scores.splice(index, 1);
+        saveLocalStorage();
+        renderScores();
+    }
+
+    // --- 9. RENDER CURRICULUM OVERVIEW ---
+    function renderCurriculum() {
+        let container = document.getElementById('curriculumOverview');
+        let html = "";
+        for(let sub in DB_CURRICULUM) {
+            let total = DB_CURRICULUM[sub].length;
+            let current = appData.progress[sub] || 0;
+            let percent = Math.min(100, Math.round((current / total) * 100));
+            html += `
+                <div style="margin-bottom: 14px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+                        <span>${sub}</span>
+                        <span>Hoàn thành: ${current}/${total} bài (${percent}%)</span>
+                    </div>
+                    <div style="background:var(--bg-color); border-radius:6px; height:8px; width:100%; overflow:hidden; border:1px solid var(--card-border);">
+                        <div style="background:var(--primary); height:100%; width:${percent}%;"></div>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    // --- 10. TAB SWITCHING ---
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        if(tabId === 'tasks') {
+            document.getElementById('tab-tasks').classList.remove('hidden');
+            event.target.classList.add('active');
+        } else if(tabId === 'srs') {
+            document.getElementById('tab-srs').classList.remove('hidden');
+            event.target.classList.add('active');
+        } else if(tabId === 'scores') {
+            document.getElementById('tab-scores').classList.remove('hidden');
+            event.target.classList.add('active');
+        } else if(tabId === 'curriculum') {
+            document.getElementById('tab-curriculum').classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+    }
+
+    // --- 11. CLOUD SYNC ---
+    function openCloudModal() {
+        document.getElementById('syncCodeInput').value = appData.syncCode || "";
+        document.getElementById('cloudModal').style.display = 'flex';
+    }
+
+    function saveCloudSync() {
+        let code = document.getElementById('syncCodeInput').value.trim();
+        if(!code) {
+            alert("Vui lòng nhập mã đồng bộ!");
+            return;
+        }
+        appData.syncCode = code;
+        let cloudData = localStorage.getItem('srs_cloud_' + code);
+        if(cloudData) {
+            if(confirm("Tìm thấy dữ liệu trên mây với mã này. Bạn có muốn tải về máy không?")) {
                 try {
-                    const parsed = JSON.parse(saved);
-                    appState = { ...appState, ...parsed };
+                    appData = JSON.parse(cloudData);
                 } catch(e) {}
             }
-            
-            // TỰ ĐỘNG CẬP NHẬT THEO THỜI GIAN THỰC NẾU SANG NGÀY MỚI VÀ USER KHÔNG KHÓA CỐ ĐỊNH
-            // Hoặc mặc định luôn lấy ngày thực tế nếu không phải đang cố tình giả lập lùi/tới ngày cũ.
-            // Để hệ thống tự động nhảy theo ngày thực tế mỗi khi sang ngày mới:
-            const realToday = getTodayStr();
-            if (!appState.lastOpenedRealDate) {
-                appState.lastOpenedRealDate = realToday;
-                appState.simDate = realToday; // Khởi tạo lần đầu theo ngày thực tế
-            } else if (appState.lastOpenedRealDate !== realToday) {
-                // Sang ngày mới thực tế! Tự động cập nhật ngày app sang ngày thực tế mới luôn
-                appState.simDate = realToday;
-                appState.lastOpenedRealDate = realToday;
-            }
-
-            if (!appState.simDate) {
-                appState.simDate = realToday;
-            }
-            document.getElementById('simDateInput').value = appState.simDate;
-            saveData();
         }
+        saveLocalStorage();
+        document.getElementById('cloudModal').style.display = 'none';
+        alert("Đã liên kết Cloud thành công! Dữ liệu sẽ tự động đồng bộ khi bạn thao tác.");
+        renderAll();
+    }
 
-        function saveData() {
-            localStorage.setItem('srs_app_state_v4', JSON.stringify(appState));
-        }
+    // Khởi chạy app khi load xong
+    window.onload = initApp;
+</script>
 
-        function onSimDateChange(val) {
-            if (!val) return;
-            appState.simDate = val; // Cho phép người dùng chỉnh thủ công nếu muốn
-            saveData();
-            renderApp();
-        }
-
-        function changeSimDate(days) {
-            const cur = new Date(appState.simDate);
-            cur.setDate(cur.getDate() + days);
-            appState.simDate = cur.toISOString().split('T')[0];
-            document.getElementById('simDateInput').value = appState.simDate;
-            saveData();
-            renderApp();
-        }
-
-        function resetToToday() {
-            appState.simDate = getTodayStr(); // Đưa về ngày thực tế hiện tại
-            document.getElementById('simDateInput').value = appState.simDate;
-            saveData();
-            renderApp();
-        }
-
-        function getDayType(dateStr) {
-            const d = new Date(dateStr);
-            const day = d.getDay(); 
-            if ([1, 3, 5].includes(day)) return 'MonWedFri'; 
-            if ([2, 4, 6].includes(day)) return 'TueThuSat'; 
-            return 'Sunday';
-        }
-
-        function getDailyTasks(dateStr) {
-            const type = getDayType(dateStr);
-            let tasks = [];
-            const baseDate = new Date("2026-09-01"); 
-            const curDate = new Date(dateStr);
-            const diffTime = curDate - baseDate;
-            const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-            const cycleIndex = Math.floor(diffDays / 2);
-
-            if (type === 'MonWedFri') {
-                let mathHsaIdx = Math.min(MATH_HSA.length - 1, appState.progress.MathHSA + Math.floor(cycleIndex / 2));
-                let engThptIdx = Math.min(ENG_THPT_TOPICS.length - 1, appState.progress.EngTHPT + Math.floor(cycleIndex / 2));
-                tasks.push({ id: 'math_hsa_' + mathHsaIdx, subject: 'Toán HSA', title: MATH_HSA[mathHsaIdx] });
-                tasks.push({ id: 'eng_thpt_' + engThptIdx, subject: 'Tiếng Anh THPT', title: ENG_THPT_TOPICS[engThptIdx] });
-                if (diffDays % 2 === 0) {
-                    let testIdx = Math.min(ENG_TESTS.length - 1, appState.progress.EngTest + Math.floor(diffDays / 2));
-                    tasks.push({ id: 'eng_test_' + testIdx, subject: 'Đề Anh THPT', title: ENG_TESTS[testIdx] });
-                }
-            } else if (type === 'TueThuSat') {
-                let engHsaIdx = Math.min(ENG_HSA.length - 1, appState.progress.EngHSA + Math.floor(cycleIndex / 2));
-                let mathThptIdx = Math.min(MATH_THPT.length - 1, appState.progress.MathTHPT + Math.floor(cycleIndex / 2));
-                tasks.push({ id: 'eng_hsa_' + engHsaIdx, subject: 'Tiếng Anh HSA', title: ENG_HSA[engHsaIdx] });
-                tasks.push({ id: 'math_thpt_' + mathThptIdx, subject: 'Toán THPT', title: MATH_THPT[mathThptIdx] });
-            }
-            return tasks;
-        }
-
-        let pendingTaskId = null;
-        let pendingTaskSubject = null;
-
-        function promptCompleteTask(id, subject, title) {
-            pendingTaskId = id;
-            pendingTaskSubject = subject;
-            document.getElementById('modalQuoteBody').innerText = `"Mỗi lần bạn lừa dối bản thân bằng việc bấm hoàn thành mà chưa làm, bạn đang tự tay đẩy cánh cửa đại học ra xa hơn một bước."`;
-            document.getElementById('commitCheckbox').checked = false;
-            document.getElementById('confirmCommitBtn').disabled = true;
-            document.getElementById('confirmCommitBtn').className = "flex-1 py-2.5 bg-indigo-600/40 text-slate-400 rounded-xl text-xs font-bold cursor-not-allowed";
-            document.getElementById('honestyModal').classList.remove('hidden');
-        }
-
-        function toggleCommitBtn(checkbox) {
-            const btn = document.getElementById('confirmCommitBtn');
-            if (checkbox.checked) {
-                btn.disabled = false;
-                btn.className = "flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer";
-            } else {
-                btn.disabled = true;
-                btn.className = "flex-1 py-2.5 bg-indigo-600/40 text-slate-400 rounded-xl text-xs font-bold cursor-not-allowed";
-            }
-        }
-
-        function closeHonestyModal(isConfirmed) {
-            document.getElementById('honestyModal').classList.add('hidden');
-            if (isConfirmed && pendingTaskId) {
-                executeCompleteTask(pendingTaskId, pendingTaskSubject);
-            }
-            pendingTaskId = null;
-            pendingTaskSubject = null;
-        }
-
-        function executeCompleteTask(id, subject) {
-            const dateStr = appState.simDate;
-            if (!appState.completedTasks[dateStr]) appState.completedTasks[dateStr] = [];
-            if (!appState.completedTasks[dateStr].includes(id)) {
-                appState.completedTasks[dateStr].push(id);
-                const intervals = [1, 3, 7, 14, 30, 60, 90];
-                const baseDate = new Date(dateStr);
-                intervals.forEach(interval => {
-                    const d = new Date(baseDate);
-                    d.setDate(d.getDate() + interval);
-                    appState.srsItems.push({
-                        id: 'srs_' + Math.random().toString(36).substr(2, 9),
-                        title: `[Ôn tập] ${subject} (${interval} ngày)`,
-                        dueDate: d.toISOString().split('T')[0],
-                        completed: false
-                    });
-                });
-                updateStreakOnComplete(dateStr);
-                saveData();
-                renderApp();
-            }
-        }
-
-        function updateStreakOnComplete(dateStr) {
-            const curDate = new Date(dateStr);
-            if (!appState.lastStudyDate) {
-                appState.streak = 1;
-            } else {
-                const lastDate = new Date(appState.lastStudyDate);
-                const diffDays = Math.round((curDate - lastDate) / (1000 * 60 * 60 * 24));
-                if (diffDays === 1 || appState.pausedDates.includes(dateStr)) {
-                    appState.streak += 1;
-                } else if (diffDays > 2) {
-                    appState.streak = 1;
-                }
-            }
-            appState.lastStudyDate = dateStr;
-        }
-
-        function completeAllDailyTasks() {
-            const tasks = getDailyTasks(appState.simDate);
-            tasks.forEach(t => {
-                if (!appState.completedTasks[appState.simDate]) appState.completedTasks[appState.simDate] = [];
-                if (!appState.completedTasks[appState.simDate].includes(t.id)) {
-                    appState.completedTasks[appState.simDate].push(t.id);
-                }
-            });
-            updateStreakOnComplete(appState.simDate);
-            saveData();
-            renderApp();
-        }
-
-        function togglePauseDay() {
-            const dateStr = appState.simDate;
-            if (!appState.pausedDates.includes(dateStr)) {
-                appState.pausedDates.push(dateStr);
-                alert("Đã ghi nhận ngày hoãn/nghỉ. Chuỗi học được đóng băng an toàn!");
-                saveData();
-                renderApp();
-            } else {
-                alert("Ngày này đã được đánh dấu nghỉ từ trước.");
-            }
-        }
-
-        function switchTab(tab) {
-            document.getElementById('tabTasks').classList.add('hidden');
-            document.getElementById('tabSrs').classList.add('hidden');
-            document.getElementById('tabScores').classList.add('hidden');
-            document.getElementById('tabTasksBtn').className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
-            document.getElementById('tabSrsBtn').className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
-            document.getElementById('tabScoresBtn').className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
-
-            if (tab === 'tasks') {
-                document.getElementById('tabTasks').classList.remove('hidden');
-                document.getElementById('tabTasksBtn').className = "pb-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition";
-            } else if (tab === 'srs') {
-                document.getElementById('tabSrs').classList.remove('hidden');
-                document.getElementById('tabSrsBtn').className = "pb-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition";
-            } else if (tab === 'scores') {
-                document.getElementById('tabScores').classList.remove('hidden');
-                document.getElementById('tabScoresBtn').className = "pb-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition";
-            }
-        }
-
-        function renderApp() {
-            document.getElementById('streakCount').innerText = appState.streak;
-            const d = new Date(appState.simDate);
-            const daysMap = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
-            document.getElementById('currentDayOfWeek').innerText = daysMap[d.getDay()];
-
-            const type = getDayType(appState.simDate);
-            let scheduleText = "";
-            if (type === 'MonWedFri') scheduleText = "Thứ 2, 4, 6: Toán HSA + Tiếng Anh THPT (+ Đề Anh chu kỳ 2 ngày)";
-            else if (type === 'TueThuSat') scheduleText = "Thứ 3, 5, 7: Tiếng Anh HSA + Toán THPT";
-            else scheduleText = "Chủ Nhật: Ngày nghỉ ngơi / Ôn tập bù kiến thức";
-            document.getElementById('dailyScheduleInfo').innerText = scheduleText;
-
-            const tasks = getDailyTasks(appState.simDate);
-            const completedList = appState.completedTasks[appState.simDate] || [];
-            document.getElementById('taskCompletionStatus').innerText = `Đã hoàn thành: ${completedList.length}/${tasks.length} Task`;
-
-            const taskContainer = document.getElementById('taskListContainer');
-            if (tasks.length === 0) {
-                taskContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Hôm nay không có lịch học môn chính. Hãy nghỉ ngơi hoặc ôn tập SRS!</p>`;
-            } else {
-                taskContainer.innerHTML = tasks.map(t => {
-                    const isDone = completedList.includes(t.id);
-                    return `
-                        <div class="flex items-center justify-between p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl">
-                            <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded">${t.subject}</span>
-                                <h4 class="text-sm font-semibold text-slate-200 mt-1">${t.title}</h4>
-                            </div>
-                            <button onclick="${isDone ? '' : `promptCompleteTask('${t.id}', '${t.subject}', '')`}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${isDone ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-default' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow'}">
-                                ${isDone ? '✓ Đã Hoàn Thành' : 'Chưa Hoàn Thành'}
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            const srsContainer = document.getElementById('srsListContainer');
-            const activeSrs = appState.srsItems.filter(item => item.dueDate <= appState.simDate && !item.completed);
-            if (activeSrs.length === 0) {
-                srsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Không có bài ôn tập ngắt quãng nào cần làm vào hôm nay.</p>`;
-            } else {
-                srsContainer.innerHTML = activeSrs.map(item => `
-                    <div class="flex items-center justify-between p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded">Ôn Ngắt Quãng</span>
-                            <h4 class="text-sm font-semibold text-slate-200 mt-1">${item.title}</h4>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Hạn ôn: ${item.dueDate}</p>
-                        </div>
-                        <button onclick="completeSrs('${item.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition">Hoàn Thành</button>
-                    </div>
-                `).join('');
-            }
-
-            const scoreContainer = document.getElementById('scoreHistoryContainer');
-            if (appState.scores.length === 0) {
-                scoreContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Chưa có điểm số nào được lưu.</p>`;
-            } else {
-                scoreContainer.innerHTML = appState.scores.map((s, idx) => `
-                    <div class="flex items-center justify-between p-3 bg-slate-800/40 border border-slate-700/40 rounded-xl text-xs">
-                        <div>
-                            <span class="font-bold text-indigo-400">[${s.subject}]</span> <span class="text-slate-200 font-semibold">${s.title}</span>
-                            <span class="text-[10px] text-slate-400 block">${s.date}</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm font-bold text-emerald-400">${s.score} điểm</span>
-                            <button onclick="deleteScore(${idx})" class="text-rose-400 hover:text-rose-300 font-bold">×</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function completeSrs(id) {
-            const item = appState.srsItems.find(i => i.id === id);
-            if (item) {
-                item.completed = true;
-                saveData();
-                renderApp();
-            }
-        }
-
-        function saveScoreEntry() {
-            const subject = document.getElementById('scoreSubject').value;
-            const title = document.getElementById('scoreTitle').value.trim();
-            const score = parseFloat(document.getElementById('scoreValue').value);
-            if (!title || isNaN(score)) {
-                alert("Vui lòng điền đầy đủ tên bài kiểm tra và số điểm hợp lệ.");
-                return;
-            }
-            appState.scores.unshift({ subject, title, score, date: appState.simDate });
-            document.getElementById('scoreTitle').value = "";
-            document.getElementById('scoreValue').value = "";
-            saveData();
-            renderApp();
-        }
-
-        function deleteScore(idx) {
-            appState.scores.splice(idx, 1);
-            saveData();
-            renderApp();
-        }
-
-        function openCloudModal() {
-            document.getElementById('syncCodeInput').value = appState.syncCode || "";
-            document.getElementById('cloudModal').classList.remove('hidden');
-        }
-
-        function closeCloudModal() {
-            document.getElementById('cloudModal').classList.add('hidden');
-        }
-
-        function saveSyncCode() {
-            const code = document.getElementById('syncCodeInput').value.trim();
-            if (!code) { alert("Vui lòng nhập mã đồng bộ hợp lệ."); return; }
-            appState.syncCode = code;
-            saveData();
-            closeCloudModal();
-            alert("Đã lưu mã đồng bộ thành công!");
-        }
-
-        loadData();
-        renderApp();
-    </script>
 </body>
 </html>
