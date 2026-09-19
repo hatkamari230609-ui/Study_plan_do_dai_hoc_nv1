@@ -114,7 +114,7 @@
             </button>
             <button onclick="switchTab('scores')" id="tab-scores" class="pb-3 px-2 flex items-center gap-2 border-b-2 border-transparent hover:text-sky-400 transition whitespace-nowrap">
                 <i data-lucide="award" class="w-4 h-4"></i>
-                Quản Lý Điểm Số
+                Quản Lý Điểm Số & Môn Học
             </button>
             <button onclick="switchTab('curriculum')" id="tab-curriculum" class="pb-3 px-2 flex items-center gap-2 border-b-2 border-transparent hover:text-sky-400 transition whitespace-nowrap">
                 <i data-lucide="book-open" class="w-4 h-4"></i>
@@ -257,6 +257,28 @@
         </div>
 
         <div id="view-scores" class="tab-view hidden flex flex-col gap-6">
+            <!-- Quản lý danh sách môn học tùy chỉnh -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h2 class="font-bold text-base text-white flex items-center gap-2">
+                            <i data-lucide="folder-plus" class="w-5 h-5 text-indigo-400"></i>
+                            Quản Lý Danh Sách Môn Học / Lĩnh Vực Điểm Số
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Thêm các môn học hoặc kỳ thi mới tùy ý để dễ dàng phân loại điểm số.</p>
+                    </div>
+                    <form onsubmit="handleAddNewSubject(event)" class="flex items-center gap-2">
+                        <input type="text" id="newSubjectInput" placeholder="VD: Hóa học, Vật lý..." required class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+                        <button type="submit" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-xs transition flex items-center gap-1 shrink-0">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Thêm Môn
+                        </button>
+                    </form>
+                </div>
+                <div id="customSubjectBadges" class="flex flex-wrap gap-2 pt-1">
+                    <!-- Injected -->
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
                     <h2 class="font-bold text-base text-white flex items-center gap-2">
@@ -271,14 +293,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Môn Học</label>
-                            <select id="scoreSubject" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-500">
-                                <option value="Toán THPT">Toán THPT</option>
-                                <option value="Tiếng Anh THPT">Tiếng Anh THPT</option>
-                                <option value="Tiếng Anh HSA">Tiếng Anh HSA</option>
-                                <option value="Toán HSA">Toán HSA</option>
-                                <option value="Đề Anh THPT">Đề Anh THPT</option>
-                            </select>
+                            <label class="block text-xs text-slate-400 mb-1">Môn Học / Lĩnh Vực</label>
+                            <input type="text" id="scoreSubject" placeholder="VD: Toán THPT, Tiếng Anh..." required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-500">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -515,16 +531,32 @@
                 "CHUYÊN ĐỀ 3. NHỊ THỨC NEWTON",
                 "CHUYÊN ĐỀ 4. TẬP HỢP",
                 "CHUYÊN ĐỀ 5. ĐƯỜNG TRÒN",
-                "CHUYÊN ĐỀ 6. LƯỢNG GIÁC",
-                "CHUYÊN ĐỀ 7. CẤP SỐ CỘNG – CẤP SỐ NHÂN",
-                "CHUYÊN ĐỀ 8. GIỚI HẠN",
-                "CHUYÊN ĐỀ 9. MŨ - LOGARIT",
+                "CHUYÊN ĐỀ 6. LƯỢNG GIÁC — Vấn đề 1: Hàm số lượng giác",
+                "CHUYÊN ĐỀ 6. LƯỢNG GIÁC — Vấn đề 2: Phương trình lượng giác cơ bản",
+                "CHUYÊN ĐỀ 6. LƯỢNG GIÁC — Vấn đề 3: Phương trình lượng giác thường gặp",
+                "CHUYÊN ĐỀ 7. CẤP SỐ CỘNG – CẤP SỐ NHÂN — Vấn đề 1: Cấp số cộng",
+                "CHUYÊN ĐỀ 7. CẤP SỐ CỘNG – CẤP SỐ NHÂN — Vấn đề 2: Cấp số nhân",
+                "CHUYÊN ĐỀ 7. CẤP SỐ CỘNG – CẤP SỐ NHÂN — Vấn đề 3: Ứng dụng cấp số cộng – cấp số nhân vào thực tế",
+                "CHUYÊN ĐỀ 8. GIỚI HẠN — Vấn đề 1: Giới hạn dãy số",
+                "CHUYÊN ĐỀ 8. GIỚI HẠN — Vấn đề 2: Giới hạn hàm số",
+                "CHUYÊN ĐỀ 8. GIỚI HẠN — Vấn đề 3: Tính liên tục của hàm số",
+                "CHUYÊN ĐỀ 9. MŨ - LOGARIT — Vấn đề 1: Hàm lũy thừa mũ – logarit",
+                "CHUYÊN ĐỀ 9. MŨ - LOGARIT — Vấn đề 2: Phương trình mũ – logarit",
                 "CHUYÊN ĐỀ 10. GÓC, KHOẢNG CÁCH TRONG KHÔNG GIAN",
                 "CHUYÊN ĐỀ 11. THỂ TÍCH",
-                "CHUYÊN ĐỀ 12. HÀM SỐ",
+                "CHUYÊN ĐỀ 12. HÀM SỐ — Vấn đề 1: Tính đơn điệu của hàm số",
+                "CHUYÊN ĐỀ 12. HÀM SỐ — Vấn đề 2: Giá trị lớn nhất – Giá trị nhỏ nhất của hàm số",
+                "CHUYÊN ĐỀ 12. HÀM SỐ — Vấn đề 3: Tiệm cận của đồ thị hàm số",
+                "CHUYÊN ĐỀ 12. HÀM SỐ — Vấn đề 4: Tương giao của đồ thị hàm số",
+                "CHUYÊN ĐỀ 12. HÀM SỐ — Vấn đề 5: Ứng dụng hàm số vào bài toán thực tế",
                 "CHUYÊN ĐỀ 13. VECTƠ",
-                "CHUYÊN ĐỀ 14. NGUYÊN HÀM - TÍCH PHÂN",
-                "CHUYÊN ĐỀ 15. TỌA ĐỘ VECTƠ",
+                "CHUYÊN ĐỀ 14. NGUYÊN HÀM - TÍCH PHÂN — Vấn đề 1: Các phương pháp tìm nguyên hàm – tích phân",
+                "CHUYÊN ĐỀ 14. NGUYÊN HÀM - TÍCH PHÂN — Vấn đề 2: Tích phân hàm ẩn",
+                "CHUYÊN ĐỀ 14. NGUYÊN HÀM - TÍCH PHÂN — Vấn đề 3: Ứng dụng của tích phân",
+                "CHUYÊN ĐỀ 15. TỌA ĐỘ VECTƠ — Vấn đề 1: Tọa độ điểm. Tọa độ vectơ",
+                "CHUYÊN ĐỀ 15. TỌA ĐỘ VECTƠ — Vấn đề 2: Phương trình mặt phẳng",
+                "CHUYÊN ĐỀ 15. TỌA ĐỘ VECTƠ — Vấn đề 3: Phương trình đường thẳng",
+                "CHUYÊN ĐỀ 15. TỌA ĐỘ VECTƠ — Vấn đề 4: Phương trình mặt cầu",
                 "CHUYÊN ĐỀ 16. XÁC SUẤT"
             ],
             deAnhTHPT: Array.from({length: 60}, (_, i) => `Đề số ${i + 1}`)
@@ -554,6 +586,7 @@
         const DEFAULT_STATE = {
             currentSimulatedDate: getTodayStr(),
             syncKey: "",
+            customSubjects: ["Toán THPT", "Tiếng Anh THPT", "Tiếng Anh HSA", "Toán HSA", "Đề Anh THPT"],
             baseline: {
                 deAnhTHPTIndex: 7, 
                 anhHSAIndex: 3,     
@@ -590,7 +623,6 @@
                 const saved = localStorage.getItem('srs_planner_app_state');
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // Automatically sync with phone's real system date on fresh load if preferred
                     const realToday = getTodayStr();
                     const simulatedDate = parsed.currentSimulatedDate && parsed.lastRealOpen === realToday 
                         ? parsed.currentSimulatedDate 
@@ -601,6 +633,7 @@
                         ...parsed,
                         currentSimulatedDate: simulatedDate,
                         lastRealOpen: realToday,
+                        customSubjects: parsed.customSubjects || DEFAULT_STATE.customSubjects,
                         progress: { ...DEFAULT_STATE.progress, ...(parsed.progress || {}) },
                         baseline: { ...DEFAULT_STATE.baseline, ...(parsed.baseline || {}) }
                     };
@@ -670,7 +703,7 @@
                 const tHsaProg = computedProg.toanHSA;
                 const tHsaTitle = CURRICULUM.toanHSA[tHsaProg.index % CURRICULUM.toanHSA.length];
                 const tHsaSubDetail = tHsaProg.subCycle === 0 
-                    ? "Buổi 1: Học & Nắm chắc lý thuyết chuyên đề mới" 
+                    ? "Buổi 1: Học & Nắm chắc lý thuyết chuyên đề / vấn đề mới" 
                     : "Buổi 2: Luyện tập chuyên sâu bài tập + Đọc trước lý thuyết CĐ tiếp theo";
                 
                 tasks.push({
@@ -1182,6 +1215,33 @@
             }
         }
 
+        function handleAddNewSubject(e) {
+            e.preventDefault();
+            const input = document.getElementById('newSubjectInput');
+            if (!input) return;
+            const subName = input.value.trim();
+            if (!subName) return;
+
+            if (!appState.customSubjects.includes(subName)) {
+                appState.customSubjects.push(subName);
+                saveState();
+                renderAllViews();
+            }
+            input.value = '';
+        }
+
+        function removeCustomSubject(subName) {
+            if (["Toán THPT", "Tiếng Anh THPT", "Tiếng Anh HSA", "Toán HSA", "Đề Anh THPT"].includes(subName)) {
+                alert("Không thể xóa các môn mặc định hệ thống!");
+                return;
+            }
+            if (confirm(`Bạn có chắc chắn muốn xóa môn "${subName}" khỏi danh sách?`)) {
+                appState.customSubjects = appState.customSubjects.filter(s => s !== subName);
+                saveState();
+                renderAllViews();
+            }
+        }
+
         function handleSaveScore(e) {
             e.preventDefault();
             const examTypeEl = document.getElementById('scoreExamType');
@@ -1193,12 +1253,17 @@
             if (!examTypeEl || !subjectEl || !scoreValEl || !scoreDateEl) return;
 
             const examType = examTypeEl.value.trim();
-            const subject = subjectEl.value;
+            const subject = subjectEl.value.trim();
             const scoreVal = parseFloat(scoreValEl.value);
             const scoreDate = scoreDateEl.value;
             const notes = scoreNotesEl ? scoreNotesEl.value.trim() : "";
 
-            if (!examType || isNaN(scoreVal)) return;
+            if (!examType || !subject || isNaN(scoreVal)) return;
+
+            // Tự động thêm vào customSubjects nếu môn này chưa tồn tại để tính điểm trung bình thống kê
+            if (!appState.customSubjects.includes(subject)) {
+                appState.customSubjects.push(subject);
+            }
 
             appState.scores.unshift({
                 id: 'score_' + Date.now(),
@@ -1213,6 +1278,7 @@
             renderAllViews();
 
             examTypeEl.value = '';
+            subjectEl.value = '';
             scoreValEl.value = '';
             if (scoreNotesEl) scoreNotesEl.value = '';
         }
@@ -1224,10 +1290,22 @@
         }
 
         function renderScoresView() {
-            const subjects = ["Toán THPT", "Tiếng Anh THPT", "Tiếng Anh HSA", "Toán HSA", "Đề Anh THPT"];
+            // Render danh sách môn học tùy chỉnh ở badge phía trên
+            const badgeContainer = document.getElementById('customSubjectBadges');
+            if (badgeContainer) {
+                badgeContainer.innerHTML = appState.customSubjects.map(sub => {
+                    const isDefault = ["Toán THPT", "Tiếng Anh THPT", "Tiếng Anh HSA", "Toán HSA", "Đề Anh THPT"].includes(sub);
+                    return `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs bg-slate-950 border border-slate-800 text-slate-200">
+                            <span>${sub}</span>
+                            ${!isDefault ? `<button onclick="removeCustomSubject('${sub}')" class="text-rose-400 hover:text-rose-300 ml-1" title="Xóa môn"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>` : ''}
+                        </span>`;
+                }).join('');
+            }
+
             const grid = document.getElementById('subjectAveragesGrid');
             if (grid) {
-                grid.innerHTML = subjects.map(subj => {
+                grid.innerHTML = appState.customSubjects.map(subj => {
                     const subjScores = appState.scores.filter(s => s.subject === subj);
                     const avg = subjScores.length > 0 
                         ? (subjScores.reduce((acc, curr) => acc + curr.scoreVal, 0) / subjScores.length).toFixed(1)
@@ -1235,7 +1313,7 @@
 
                     return `
                         <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex flex-col gap-1">
-                            <p class="text-xs text-slate-400 font-medium">${subj}</p>
+                            <p class="text-xs text-slate-400 font-medium truncate">${subj}</p>
                             <div class="flex items-baseline justify-between mt-1">
                                 <span class="text-2xl font-extrabold ${avg !== '--' && parseFloat(avg) >= 8 ? 'text-emerald-400' : 'text-sky-400'}">${avg}</span>
                                 <span class="text-[10px] text-slate-500">${subjScores.length} bài test</span>
@@ -1458,7 +1536,6 @@
             try {
                 const realToday = getTodayStr();
                 
-                // If the user's device day changed since last open, sync simulated date to real date automatically
                 if (appState.lastRealOpen !== realToday && !appState._userCustomSimulatedDate) {
                     appState.currentSimulatedDate = realToday;
                 }
@@ -1476,4 +1553,3 @@
     </script>
 </body>
 </html>
-
